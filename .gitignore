@@ -1,0 +1,15 @@
+build/bin
+frontend/dist/*
+!frontend/dist/.gitkeep
+frontend/node_modules
+internal/engine/bin/core-*
+android/app/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/jniLibs/
+android/build/
+android/app/release/
+*.apk
+android/native/obj/
+android/native/libs/
+dist/*.zip
