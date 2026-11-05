@@ -101,7 +101,7 @@ MIT. See [LICENSE](LICENSE). Bundled components keep their own licenses, listed 
 
 ---
 
-🇷🇺 **[Читать по-русски →](docs/README.ru.md)**
+**[Read in Russian →](docs/README.ru.md)**
 
 <sub>Keywords: DPI bypass, deep packet inspection, SNI filtering, unblock Instagram, unblock
 YouTube, censorship circumvention, ByeDPI GUI, zapret alternative, Amnezia alternative,
