@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0E1117</color>
+    <color name="bg_elevated">#151A22</color>
+    <color name="bg_nav">#0B0E13</color>
+    <color name="card">#141A24</color>
+    <color name="card_stroke">#1E2733</color>
+
+    <color name="text_primary">#E8ECF3</color>
+    <color name="text_secondary">#8B95A7</color>
+    <color name="text_muted">#5A6474</color>
+
+    <color name="accent_on">#2FD47B</color>
+    <color name="accent_connecting">#F5A524</color>
+    <color name="accent_off">#4A5568</color>
+
+    <color name="ring_track">#1D2430</color>
+    <color name="dot_off">#3A4454</color>
+</resources>

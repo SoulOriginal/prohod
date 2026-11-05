@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Prohod" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">#0E1117</item>
+        <item name="android:navigationBarColor">#0B0E13</item>
+        <item name="android:windowBackground">#0E1117</item>
+    </style>
+</resources>
