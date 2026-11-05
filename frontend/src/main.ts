@@ -21,12 +21,12 @@ const icons = {
 const esc = (s: string) => s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
 
 function bytes(n: number): string {
-  const u = ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ'];
+  const u = ['B', 'KB', 'MB', 'GB', 'TB'];
   let i = 0;
   while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
   return (i === 0 ? n.toFixed(0) : n.toFixed(n < 10 ? 1 : 0)) + ' ' + u[i];
 }
-const speed = (n: number) => bytes(n) + '/с';
+const speed = (n: number) => bytes(n) + '/s';
 function dur(ms: number): string {
   const s = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, ss = s % 60;
@@ -36,9 +36,9 @@ function dur(ms: number): string {
 function ago(ms: number): string {
   if (!ms) return '';
   const s = Math.floor((Date.now() - ms) / 1000);
-  if (s < 60) return 'только что';
-  if (s < 3600) return `${Math.floor(s / 60)} мин назад`;
-  return `${Math.floor(s / 3600)} ч назад`;
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  return `${Math.floor(s / 3600)} h ago`;
 }
 
 let tab = 'home';
@@ -53,10 +53,10 @@ app.innerHTML = `
   <div class="titlebar"></div>
   <main id="view"></main>
   <nav>
-    <button data-tab="home">${icons.home}Главная</button>
-    <button data-tab="services">${icons.grid}Сервисы</button>
-    <button data-tab="log">${icons.list}Журнал</button>
-    <button data-tab="settings">${icons.gear}Настройки</button>
+    <button data-tab="home">${icons.home}Home</button>
+    <button data-tab="services">${icons.grid}Services</button>
+    <button data-tab="log">${icons.list}Log</button>
+    <button data-tab="settings">${icons.gear}Settings</button>
   </nav>
   <div class="toast" id="toast"></div>`;
 const view = document.getElementById('view')!;
@@ -88,12 +88,12 @@ async function toggle() {
 function homeView(): string {
   const on = st.state === 'on';
   const busy = st.state === 'connecting' || st.state === 'stopping';
-  const title = on ? 'Защищено' : busy ? (st.state === 'connecting' ? 'Подключение' : 'Отключение') : 'Не подключено';
-  const sub = on ? dur(Date.now() - st.since) : (st.message || 'Нажмите, чтобы включить');
+  const title = on ? 'Protected' : busy ? (st.state === 'connecting' ? 'Connecting' : 'Disconnecting') : 'Not connected';
+  const sub = on ? dur(Date.now() - st.since) : (st.message || 'Tap to turn on');
   const s = snap;
   const checks = (st.checks || []).map(c => {
     const cls = !c.done ? 'wait' : c.ok ? 'ok' : 'bad';
-    const r = !c.done ? 'проверка…' : c.ok ? `доступен · ${c.ms} мс` : 'недоступен';
+    const r = !c.done ? 'checking…' : c.ok ? `reachable · ${c.ms} ms` : 'unreachable';
     return `<div class="check"><span>${esc(c.name)}</span><span class="r">${r}<span class="dot ${cls}"></span></span></div>`;
   }).join('');
   return `
@@ -102,8 +102,8 @@ function homeView(): string {
       <button class="power ${on ? 'on' : ''} ${busy ? 'busy' : ''}" id="power" aria-label="toggle">${icons.power}</button>
       <div class="state"><div class="title">${title}</div><div class="sub">${esc(sub)}</div></div>
       <div class="metrics">
-        <div class="metric"><div class="k">${icons.down} Получено</div><div class="v">${s ? bytes(s.bytesIn) : '—'}</div><div class="s">${s && on ? speed(s.speedIn) : ''}</div></div>
-        <div class="metric"><div class="k">${icons.up} Отправлено</div><div class="v">${s ? bytes(s.bytesOut) : '—'}</div><div class="s">${s && on ? speed(s.speedOut) : ''}</div></div>
+        <div class="metric"><div class="k">${icons.down} Received</div><div class="v">${s ? bytes(s.bytesIn) : '—'}</div><div class="s">${s && on ? speed(s.speedIn) : ''}</div></div>
+        <div class="metric"><div class="k">${icons.up} Sent</div><div class="v">${s ? bytes(s.bytesOut) : '—'}</div><div class="s">${s && on ? speed(s.speedOut) : ''}</div></div>
       </div>
       ${checks ? `<div class="checks">${checks}</div>` : ''}
     </div>`;
@@ -113,20 +113,20 @@ function servicesView(): string {
   const svcs = (snap?.services || []);
   const rows = svcs.map(v => {
     const used = v.ok + v.failed;
-    let cls = '', meta = 'нет активности';
+    let cls = '', meta = 'no activity';
     if (v.active > 0 || used > 0) {
       const rate = used ? v.ok / used : 1;
       cls = v.lastOk >= v.lastFail ? 'ok' : rate >= 0.5 ? 'wait' : 'bad';
-      meta = `${bytes(v.bytesIn + v.bytesOut)} · ${v.active ? 'активно' : ago(Math.max(v.lastOk, v.lastFail))}`;
+      meta = `${bytes(v.bytesIn + v.bytesOut)} · ${v.active ? 'active' : ago(Math.max(v.lastOk, v.lastFail))}`;
     }
     return `<div class="row"><span class="dot ${cls}"></span><div class="name">${esc(v.name)}</div><div class="meta">${meta}</div></div>`;
   }).join('');
   return `
-    <h2>Сервисы</h2>
-    <div class="card">${rows || '<div class="empty">Подключитесь, чтобы увидеть активность</div>'}</div>
-    <p class="hint">Зелёный — соединения проходят. Красный — сервис не отвечает в вашей сети.
-      Оптимизировано маршрутов: ${st.pinned}. Остальные сайты подбираются автоматически.</p>
-    ${snap ? `<p class="hint">Соединений: ${snap.connections} активно · ${snap.total} всего · ${snap.failed} без ответа</p>` : ''}`;
+    <h2>Services</h2>
+    <div class="card">${rows || '<div class="empty">Connect to see activity</div>'}</div>
+    <p class="hint">Green means connections get through. Red means the service does not answer on your network.
+      Optimized routes: ${st.pinned}. Other sites are handled automatically.</p>
+    ${snap ? `<p class="hint">Connections: ${snap.connections} active · ${snap.total} total · ${snap.failed} no answer</p>` : ''}`;
 }
 
 let logCache: Ent[] = [];
@@ -136,23 +136,23 @@ function logView(): string {
     return `<div class="ln"><span class="t">${t}</span> <span class="${esc(e.level)}">${esc(e.msg)}</span></div>`;
   }).join('');
   return `
-    <h2>Журнал</h2>
-    <div class="card"><div class="log" id="log">${lines || '<div class="empty">Пока пусто</div>'}</div></div>
-    <div class="toolbar"><button class="btn" id="openlogs">Открыть папку с журналом</button></div>`;
+    <h2>Log</h2>
+    <div class="card"><div class="log" id="log">${lines || '<div class="empty">Nothing yet</div>'}</div></div>
+    <div class="toolbar"><button class="btn" id="openlogs">Open log folder</button></div>`;
 }
 
 function settingsView(): string {
   const sw = (id: string, on: boolean) => `<label class="switch"><input type="checkbox" id="${id}" ${on ? 'checked' : ''}><span></span></label>`;
   return `
-    <h2>Настройки</h2>
+    <h2>Settings</h2>
     <div class="card">
-      <div class="row"><div class="name">Подключаться при запуске<div class="desc">Включать защиту сразу после открытия приложения</div></div>${sw('autoConnect', cfg.autoConnect)}</div>
-      <div class="row"><div class="name">Только IPv4<div class="desc">Если в вашей сети нестабилен IPv6. Применится при следующем подключении</div></div>${sw('ipv4Only', cfg.ipv4Only)}</div>
+      <div class="row"><div class="name">Connect on launch<div class="desc">Turn on protection as soon as the app opens</div></div>${sw('autoConnect', cfg.autoConnect)}</div>
+      <div class="row"><div class="name">IPv4 only<div class="desc">For networks where IPv6 is unreliable. Applies on the next connect</div></div>${sw('ipv4Only', cfg.ipv4Only)}</div>
     </div>
-    <h2>О программе</h2>
-    <div class="card"><div class="row"><div class="name">Prohod</div><div class="meta">версия ${esc(version)}</div></div></div>
-    <p class="hint">Работает локально на этом устройстве: без серверов, учётных записей и сбора данных.
-      Сторонние компоненты и их лицензии перечислены в файле LICENSES внутри приложения.</p>`;
+    <h2>About</h2>
+    <div class="card"><div class="row"><div class="name">Prohod</div><div class="meta">version ${esc(version)}</div></div></div>
+    <p class="hint">Runs locally on this device: no servers, no accounts, no data collection.
+      Bundled components and their licenses are listed in the LICENSES file inside the app.</p>`;
 }
 
 function bind() {

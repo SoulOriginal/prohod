@@ -13,7 +13,7 @@ an account or rent a server, and your traffic never leaves through someone else'
 
 ## What it actually does
 
-A lot of "blocking" in Russia and nearby countries happens at the TLS handshake. The
+A lot of "blocking" happens at the TLS handshake. The
 provider reads the site name (SNI) in the first packet and drops the connection. Prohod
 splits and reorders that first packet so the name never appears as one clean string, while
 the real server still understands it. The site opens; the filter sees noise.
@@ -104,5 +104,5 @@ MIT. See [LICENSE](LICENSE). Bundled components keep their own licenses, listed 
 🇷🇺 **[Читать по-русски →](docs/README.ru.md)**
 
 <sub>Keywords: DPI bypass, deep packet inspection, SNI filtering, unblock Instagram, unblock
-YouTube, Roskomnadzor / РКН, censorship circumvention, ByeDPI GUI, zapret alternative, Amnezia
-alternative, no-VPN unblocker, macOS, Linux, Android.</sub>
+YouTube, censorship circumvention, ByeDPI GUI, zapret alternative, Amnezia alternative,
+no-VPN unblocker, macOS, Linux, Android.</sub>

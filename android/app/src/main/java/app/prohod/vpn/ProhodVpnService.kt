@@ -58,7 +58,7 @@ class ProhodVpnService : VpnService() {
             } catch (e: Throwable) {
                 Log.e(TAG, "connect failed", e)
                 teardown()
-                State.set(State.OFF, "Не удалось подключиться")
+                State.set(State.OFF, "Couldn't connect")
                 stopSelfSafely()
             }
         }
@@ -186,12 +186,12 @@ class ProhodVpnService : VpnService() {
         )
         return NotificationCompat.Builder(this, CHANNEL)
             .setContentTitle("Prohod")
-            .setContentText("Защита включена")
+            .setContentText("Protection is on")
             .setSmallIcon(R.drawable.ic_stat)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(open)
-            .addAction(0, "Отключить", stop)
+            .addAction(0, "Disconnect", stop)
             .build()
     }
 

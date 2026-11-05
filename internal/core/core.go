@@ -67,7 +67,7 @@ type Controller struct {
 
 // SelfTestTargets are probed after connecting (TLS handshake through our own proxy).
 var SelfTestTargets = []struct{ Name, Host string }{
-	{"Интернет", "www.google.com"},
+	{"Internet", "www.google.com"},
 	{"Instagram", "www.instagram.com"},
 	{"YouTube", "www.youtube.com"},
 }
@@ -95,9 +95,9 @@ func New() (*Controller, error) {
 	c.status = Status{State: StateOff, Since: now(), Pinned: countPinned()}
 	if repaired, err := sysproxy.RepairStale(c.statePath); repaired {
 		if err != nil {
-			c.Log.Warnf("Восстановление сетевых настроек после прошлого сбоя: частично (%v)", err)
+			c.Log.Warnf("Network settings restored after a previous crash: partial (%v)", err)
 		} else {
-			c.Log.Infof("Сетевые настройки восстановлены после прошлого незавершённого сеанса")
+			c.Log.Infof("Network settings restored after a previous unfinished session")
 		}
 	}
 	return c, nil
@@ -141,7 +141,7 @@ func (c *Controller) Connect() error {
 		c.mu.Unlock()
 		return nil
 	}
-	c.setState(StateConnecting, "Подключение…")
+	c.setState(StateConnecting, "Connecting…")
 	c.status.Checks = nil
 	c.gen++
 	gen := c.gen
@@ -159,15 +159,15 @@ func (c *Controller) Connect() error {
 
 	path, err := engine.Prepare(filepath.Join(c.cacheDir, "core"))
 	if err != nil {
-		return fail(err, "Модуль защиты недоступен")
+		return fail(err, "The protection module is unavailable")
 	}
 	args, err := profile.Build(filepath.Join(c.cfgDir, "lists"), profile.Options{IPv4Only: settings.IPv4Only || !ipv6Works()})
 	if err != nil {
-		return fail(err, "Не удалось подготовить профиль")
+		return fail(err, "Could not prepare the profile")
 	}
 	proc, err := engine.Start(path, args)
 	if err != nil {
-		return fail(err, "Не удалось запустить модуль защиты")
+		return fail(err, "Could not start the protection module")
 	}
 	c.mu.Lock()
 	c.proc = proc
@@ -175,7 +175,7 @@ func (c *Controller) Connect() error {
 
 	fs, err := front.Listen(c.enginePort, profile.ServiceOf, c.Stats)
 	if err != nil {
-		return fail(err, "Не удалось открыть локальный порт")
+		return fail(err, "Could not open a local port")
 	}
 	c.mu.Lock()
 	c.front = fs
@@ -183,23 +183,23 @@ func (c *Controller) Connect() error {
 
 	st, err := sysproxy.Capture(fs.Port())
 	if err != nil {
-		return fail(err, "Не удалось прочитать сетевые настройки системы")
+		return fail(err, "Could not read the system network settings")
 	}
 	st.EnginePID = proc.Pid()
 	if err := sysproxy.SaveState(c.statePath, st); err != nil {
-		return fail(err, "Не удалось сохранить сетевые настройки")
+		return fail(err, "Could not save the network settings")
 	}
 	c.mu.Lock()
 	c.proxySt = st
 	c.mu.Unlock()
 	if err := sysproxy.Apply(st); err != nil {
-		return fail(err, "Не удалось применить сетевые настройки")
+		return fail(err, "Could not apply the network settings")
 	}
 
 	c.mu.Lock()
-	c.setState(StateOn, "Защита включена")
+	c.setState(StateOn, "Protection is on")
 	c.mu.Unlock()
-	c.Log.Infof("Подключено")
+	c.Log.Infof("Connected")
 	go c.watchEngine(gen, proc)
 	go c.selfTest(gen)
 	return nil
@@ -243,16 +243,16 @@ func (c *Controller) watchEngine(gen int, p *engine.Proc) {
 				_ = sysproxy.SaveState(c.statePath, c.proxySt)
 			}
 			c.mu.Unlock()
-			c.Log.Warnf("Модуль защиты перезапущен")
+			c.Log.Warnf("Protection module restarted")
 			go c.watchEngine(gen, np)
 			return
 		}
-		c.Log.Errorf("Перезапуск модуля не удался: %v", err)
+		c.Log.Errorf("Module restart failed: %v", err)
 	}
-	c.Log.Errorf("Модуль защиты остановился, соединение отключено")
+	c.Log.Errorf("Protection module stopped, connection closed")
 	_ = c.Disconnect()
 	c.mu.Lock()
-	c.status.Message = "Отключено из-за сбоя модуля"
+	c.status.Message = "Disconnected after a module failure"
 	c.mu.Unlock()
 }
 
@@ -286,9 +286,9 @@ func (c *Controller) selfTest(gen int) {
 	st := c.Status()
 	for _, ch := range st.Checks {
 		if ch.OK {
-			c.Log.Infof("Проверка «%s»: доступно (%d мс)", ch.Name, ch.Ms)
+			c.Log.Infof("Check \"%s\": reachable (%d ms)", ch.Name, ch.Ms)
 		} else {
-			c.Log.Warnf("Проверка «%s»: недоступно", ch.Name)
+			c.Log.Warnf("Check \"%s\": unreachable", ch.Name)
 		}
 	}
 }
@@ -326,7 +326,7 @@ func (c *Controller) teardown() {
 	c.mu.Unlock()
 	if st != nil {
 		if err := sysproxy.Restore(st); err != nil {
-			c.Log.Errorf("Восстановление сетевых настроек: %v", err)
+			c.Log.Errorf("Restoring network settings: %v", err)
 		} else {
 			_ = os.Remove(c.statePath)
 		}
@@ -347,14 +347,14 @@ func (c *Controller) Disconnect() error {
 		c.mu.Unlock()
 		return nil
 	}
-	c.setState(StateStopping, "Отключение…")
+	c.setState(StateStopping, "Disconnecting…")
 	c.mu.Unlock()
 	c.teardown()
 	c.mu.Lock()
-	c.setState(StateOff, "Защита выключена")
+	c.setState(StateOff, "Protection is off")
 	c.status.Checks = nil
 	c.mu.Unlock()
-	c.Log.Infof("Отключено")
+	c.Log.Infof("Disconnected")
 	return nil
 }
 
@@ -367,7 +367,7 @@ func (c *Controller) Shutdown() {
 // StartGuard launches the watchdog process once per app run (it outlives a crash of this process).
 func (c *Controller) StartGuard() {
 	if err := guard.Spawn(c.statePath); err != nil {
-		c.Log.Warnf("Сторож не запущен: %v", err)
+		c.Log.Warnf("Guard did not start: %v", err)
 	}
 }
 

@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Доступ без ограничений"
+            android:text="Open access"
             android:textColor="@color/text_muted"
             android:textSize="13sp" />
 
@@ -58,7 +58,7 @@
             android:id="@+id/statusTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Не подключено"
+            android:text="Not connected"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Нажмите, чтобы включить"
+            android:text="Tap to turn on"
             android:textColor="@color/text_secondary"
             android:textSize="15sp"
             android:gravity="center" />
@@ -85,7 +85,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Сервисы"
+                android:text="Services"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:letterSpacing="0.05"
@@ -128,14 +128,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Только IPv4"
+                    android:text="IPv4 only"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Включите в сетях без IPv6"
+                    android:text="Use on networks without IPv6"
                     android:textColor="@color/text_muted"
                     android:textSize="12sp" />
             </LinearLayout>

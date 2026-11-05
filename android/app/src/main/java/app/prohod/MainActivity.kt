@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         ipv4Switch.setOnCheckedChangeListener { _, checked -> Prefs.setIpv4Only(this, checked) }
 
         buildServiceChips()
-        routesInfo.text = "Оптимизировано маршрутов: ${Profile.pinnedCount(this)}"
+        routesInfo.text = "Optimized routes: ${Profile.pinnedCount(this)}"
     }
 
     private fun buildServiceChips() {
@@ -139,26 +139,26 @@ class MainActivity : AppCompatActivity() {
         val on = State.value == State.ON
         when (State.value) {
             State.ON -> {
-                statusTitle.text = "Защищено"
+                statusTitle.text = "Protected"
                 statusSub.text = elapsed()
                 powerButton.setBackgroundResource(R.drawable.power_ring_on)
                 tintIcon(R.color.accent_on)
             }
             State.CONNECTING -> {
-                statusTitle.text = "Подключение"
-                statusSub.text = "Устанавливаем защищённое соединение…"
+                statusTitle.text = "Connecting"
+                statusSub.text = "Establishing a secure connection…"
                 powerButton.setBackgroundResource(R.drawable.power_ring_connecting)
                 tintIcon(R.color.accent_connecting)
             }
             State.STOPPING -> {
-                statusTitle.text = "Отключение"
+                statusTitle.text = "Disconnecting"
                 statusSub.text = "…"
                 powerButton.setBackgroundResource(R.drawable.power_ring_connecting)
                 tintIcon(R.color.accent_connecting)
             }
             else -> {
-                statusTitle.text = "Не подключено"
-                statusSub.text = State.message ?: "Нажмите, чтобы включить"
+                statusTitle.text = "Not connected"
+                statusSub.text = State.message ?: "Tap to turn on"
                 powerButton.setBackgroundResource(R.drawable.power_ring_off)
                 tintIcon(R.color.accent_off)
             }
